@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.event.*;
 
 class HelloComponent2 extends JComponent
-implements MouseMotionListener, ActionListener 
+implements MouseMotionListener, ActionListener, Runnable 
 {
 String theMessage;
 
@@ -22,6 +22,8 @@ static Color[] someColors = {
 		Color.black, Color.red, Color.white, Color.green, Color.blue, Color.magenta
 }; // массив цветов
 
+boolean blinkState;
+
 public HelloComponent2 (String message) {
 	
 	theMessage = message;
@@ -35,8 +37,14 @@ public HelloComponent2 (String message) {
 	theButton.addActionListener(this);
 	
 	addMouseMotionListener (this);
+	
+	Thread t = new Thread (this);
+	
+	t.start();
 }	
 public void paintComponent (Graphics g) {
+	
+	g.setColor( blinkState ? getBackground () : currentColor () );
 	
 	g.drawString (theMessage, messageX, messageY);
 	
@@ -78,6 +86,19 @@ synchronized private void  changeColor () {
 		repaint ();
 }
 	
+public void run() {
 	
+	try {
+		
+		while (true) {
+			
+			blinkState =!blinkState; // переключиить состояние
+			
+			repaint (); // показать изменения
+			
+			Thread.sleep (300);
+		}
+	} catch (InterruptedException ie) { }
+}
 
 }
